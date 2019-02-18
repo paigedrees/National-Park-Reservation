@@ -6,6 +6,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.techelevator.projects.model.Department;
 import com.techelevator.projects.model.DepartmentDAO;
@@ -20,27 +21,59 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 
 	@Override
 	public List<Department> getAllDepartments() {
-		return new ArrayList<>();
+		ArrayList <Department> departments = new ArrayList<>();
+		String sqlFindDepartment = "SELECT * FROM departments";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlFindDepartment);
+		while (results.next()) {
+			Department currentDept = new Department();
+				currentDept.setName(results.getString("name"));
+				departments.add(currentDept);
+		}
+		return departments;
 	}
 
 	@Override
 	public List<Department> searchDepartmentsByName(String nameSearch) {
-		return new ArrayList<>();
+		ArrayList <Department> departments = new ArrayList<>();
+		String sqlFindDepartment = "SELECT name FROM department WHERE name = %?%";
+		jdbcTemplate.update(sqlFindDepartment, nameSearch);
+			return new ArrayList<>();
 	}
 
 	@Override
 	public void saveDepartment(Department updatedDepartment) {
+		String sqlFindDepartment = "UPDATE name FROM department WHERE name = ?";
+		jdbcTemplate.update(sqlFindDepartment, updatedDepartment);
 		
 	}
 
 	@Override
 	public Department createDepartment(Department newDepartment) {
-		return null;
+		String sqlCreateDepartment = "INSERT INTO department (name) VALUES ?";
+		newDepartment.setId(getNextDepartmentId());
+		jdbcTemplate.update(sqlCreateDepartment, newDepartment.getId(),
+												 newDepartment.getName());
+			return newDepartment;
+	}
+	
+	private long getNextDepartmentId() {
+		SqlRowSet nextIdResult = jdbcTemplate.queryForRowSet("SELECT nextval('seq_department_id')");
+		if(nextIdResult.next()) {
+			return nextIdResult.getLong(1);
+		} else {
+			throw new RuntimeException("Something went wrong while getting an id for the new city");
+		}
 	}
 
 	@Override
 	public Department getDepartmentById(Long id) {
-		return null;
+		Department newDept = new Department();
+		String sqlFindDepartment = "SELECT name FROM department WHERE id = ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlFindDepartment, id);
+		newDept.setId(result.getLong("id"));
+		newDept.setName(result.getString("name"));
+		
+		return newDept;
 	}
 
 }
