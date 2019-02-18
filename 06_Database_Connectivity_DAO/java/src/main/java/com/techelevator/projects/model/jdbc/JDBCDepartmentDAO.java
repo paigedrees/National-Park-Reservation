@@ -37,7 +37,7 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 		ArrayList <Department> departments = new ArrayList<>();
 		String sqlFindDepartment = "SELECT name FROM department WHERE name = %?%";
 		jdbcTemplate.update(sqlFindDepartment, nameSearch);
-			return new ArrayList<>();
+			return departments;
 	}
 
 	@Override
