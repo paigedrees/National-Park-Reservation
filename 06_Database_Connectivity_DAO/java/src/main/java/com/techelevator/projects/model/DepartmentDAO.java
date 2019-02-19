@@ -1,5 +1,6 @@
 package com.techelevator.projects.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface DepartmentDAO {
@@ -10,7 +11,7 @@ public interface DepartmentDAO {
 	 * @return all departments as Department objects in a List
 	 */
 	public List<Department> getAllDepartments();
-
+	
 	/**
 	 * Get all the departments whose name contains the search string. Remember
 	 * to use LIKE or ILIKE to do a fuzzy match on the search.

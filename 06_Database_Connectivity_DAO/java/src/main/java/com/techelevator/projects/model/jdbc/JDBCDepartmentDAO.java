@@ -42,14 +42,14 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 
 	@Override
 	public void saveDepartment(Department updatedDepartment) {
-		String sqlFindDepartment = "UPDATE name FROM department WHERE name = ?";
+		String sqlFindDepartment = "UPDATE department SET name WHERE name = ?";
 		jdbcTemplate.update(sqlFindDepartment, updatedDepartment);
 		
 	}
 
 	@Override
 	public Department createDepartment(Department newDepartment) {
-		String sqlCreateDepartment = "INSERT INTO department (name) VALUES ?";
+		String sqlCreateDepartment = "INSERT INTO department (department_id, name) VALUES (?, ?)";
 		newDepartment.setId(getNextDepartmentId());
 		jdbcTemplate.update(sqlCreateDepartment, newDepartment.getId(),
 												 newDepartment.getName());
