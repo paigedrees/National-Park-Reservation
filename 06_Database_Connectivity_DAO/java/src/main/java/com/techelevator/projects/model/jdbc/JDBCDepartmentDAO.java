@@ -22,7 +22,7 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 	@Override
 	public List<Department> getAllDepartments() {
 		ArrayList <Department> departments = new ArrayList<>();
-		String sqlFindDepartment = "SELECT * FROM departments";
+		String sqlFindDepartment = "SELECT * FROM department";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlFindDepartment);
 		while (results.next()) {
 			Department currentDept = new Department();
@@ -35,15 +35,19 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 	@Override
 	public List<Department> searchDepartmentsByName(String nameSearch) {
 		ArrayList <Department> departments = new ArrayList<>();
-		String sqlFindDepartment = "SELECT name FROM department WHERE name = %?%";
-		jdbcTemplate.update(sqlFindDepartment, nameSearch);
+		String sqlFindDepartment = "SELECT * FROM department WHERE name LIKE ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlFindDepartment, "%" + nameSearch + "%");
+		while (result.next()) {
+			Department dept = mapRowToDepartment(result);
+			departments.add(dept);
+		}
 			return departments;
 	}
 
 	@Override
 	public void saveDepartment(Department updatedDepartment) {
-		String sqlFindDepartment = "UPDATE department SET name WHERE name = ?";
-		jdbcTemplate.update(sqlFindDepartment, updatedDepartment);
+		String sqlFindDepartment = "UPDATE department SET name = ? WHERE department_id = ?";
+		jdbcTemplate.update(sqlFindDepartment, updatedDepartment.getName(), updatedDepartment.getId());
 		
 	}
 
@@ -61,19 +65,29 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 		if(nextIdResult.next()) {
 			return nextIdResult.getLong(1);
 		} else {
-			throw new RuntimeException("Something went wrong while getting an id for the new city");
+			throw new RuntimeException("Something went wrong while getting an id for the new ");
 		}
 	}
 
 	@Override
 	public Department getDepartmentById(Long id) {
 		Department newDept = new Department();
-		String sqlFindDepartment = "SELECT name FROM department WHERE id = ?";
+		String sqlFindDepartment = "SELECT * FROM department WHERE department_id = ?";
 		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlFindDepartment, id);
-		newDept.setId(result.getLong("id"));
-		newDept.setName(result.getString("name"));
+		if (result.next()) {
 		
+		newDept.setId(result.getLong("department_id"));
+		newDept.setName(result.getString("name"));
+		}
 		return newDept;
+		
+	}
+	
+	public Department mapRowToDepartment(SqlRowSet results) {
+		Department newDepartment = new Department();
+		newDepartment.setId(results.getLong("department_id"));
+		newDepartment.setName(results.getString("name"));
+		return newDepartment;
 	}
 
 }
