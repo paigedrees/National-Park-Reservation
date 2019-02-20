@@ -33,7 +33,7 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 				newEmployee.setLastName(results.getString("last_name"));
 				newEmployee.setId(results.getLong("employee_id"));
 				newEmployee.setDepartmentId(results.getLong("department_id"));
-				newEmployee.setBirthDay(results.getDate("birthDate").toLocalDate());
+				newEmployee.setBirthDay(results.getDate("birth_date").toLocalDate());
 				newEmployee.setGender(results.getString("gender").charAt(0));
 				newEmployee.setHireDate(results.getDate("hire_date").toLocalDate());
 				employees.add(newEmployee);
@@ -44,9 +44,13 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 	@Override
 	public List<Employee> searchEmployeesByName(String firstNameSearch, String lastNameSearch) {
 		ArrayList <Employee> employees = new ArrayList<>();
-		String sqlFindEmployees = "SELECT first_name, last_name FROM employee WHERE first_name = %?% OR last_name = %?%";
-		jdbcTemplate.update(sqlFindEmployees, firstNameSearch, lastNameSearch);
-			
+		String sqlFindEmployees = "SELECT first_name, last_name FROM employee WHERE first_name LIKE ? OR last_name LIKE ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlFindEmployees, "%" + firstNameSearch + "%", "%" + lastNameSearch + "%");
+		while (result.next()) {
+			Employee employee = mapRowToEmployee(result);
+			employees.add(employee);
+			employee.setId(result.getLong("employee_id"));
+		}		
 		return employees;
 		
 	}
@@ -71,7 +75,7 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 		newEmployee.setLastName(results.getString("last_name"));
 		newEmployee.setId(results.getLong("employee_id"));
 		newEmployee.setDepartmentId(results.getLong("department_id"));
-		newEmployee.setBirthDay(results.getDate("birthDate").toLocalDate());
+		newEmployee.setBirthDay(results.getDate("birth_date").toLocalDate());
 		newEmployee.setGender(results.getString("gender").charAt(0));
 		newEmployee.setHireDate(results.getDate("hire_date").toLocalDate());
 		return newEmployee;
@@ -82,8 +86,8 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 		ArrayList <Employee> employees = new ArrayList<>();
 		String sqlEmployeeWithoutProject = "SELECT first_name, last_name " + 
 											"FROM employee " + 
-											"LEFT JOIN project_employee ON project_employee.employeeId = employee.employeeId " +
-											"WHERE project_employee.employeeId IS NULL";
+											"LEFT JOIN project_employee ON project_employee.employee_id = employee.employee_id " +
+											"WHERE project_employee.employee_id IS NULL";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlEmployeeWithoutProject);
 		while(results.next()) {
 			Employee newEmployee = mapRowToEmployee(results);
@@ -98,8 +102,8 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 		ArrayList <Employee> employees = new ArrayList<>();
 		String sqlEmployeeWithoutProject = "SELECT first_name, last_name " + 
 											"FROM employee " + 
-											"JOIN project_employee ON project_employee.employeeId = employee.employeeId " +
-											"WHERE project_employee.employeeId = ?";
+											"JOIN project_employee ON project_employee.employee_id = employee.employee_id " +
+											"WHERE project_employee.employee_id = ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlEmployeeWithoutProject, projectId);
 		while(results.next()) {
 			Employee newEmployee = mapRowToEmployee(results);
@@ -110,9 +114,27 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 	}
 
 	@Override
-	public void changeEmployeeDepartment(Long employeeId, Long departmentId) {
+	public void changeEmployeeDepartment(Long departmentId, Long employeeId) {
 		String sqlChangeDepartment = "UPDATE employee SET department_id = ? WHERE employee_id = ?";
 		jdbcTemplate.update(sqlChangeDepartment, departmentId, employeeId);
 	}
 
+	public Employee createEmployee(Employee newEmployee) {
+		String sqlCreateEmployee = "INSERT INTO employee (employee_id, department_id, first_name, last_name, birth_date, gender, hire_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		newEmployee.setId(getNextEmployeeId());
+		jdbcTemplate.update(sqlCreateEmployee, newEmployee.getId(), newEmployee.getDepartmentId(), newEmployee.getFirstName(), newEmployee.getLastName(), newEmployee.getBirthDay(),
+				newEmployee.getGender(), newEmployee.getHireDate());
+			return newEmployee;
+	}
+	
+	public long getNextEmployeeId() {
+		SqlRowSet nextId = jdbcTemplate.queryForRowSet("SELECT nextval('seq_employee_id')");
+		if (nextId.next()) {
+			return nextId.getLong(1);
+		}
+		else {
+			throw new RuntimeException ("Something went wrong while getting an id!");
+		}
+	}
+	
 }
