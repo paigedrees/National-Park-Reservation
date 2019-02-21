@@ -1,11 +1,14 @@
 package com.techelevator;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import com.techelevator.model.Campground;
 import com.techelevator.model.CampgroundDao;
 import com.techelevator.model.JdbcCampgroundDao;
 import com.techelevator.model.JdbcParkDao;
@@ -19,6 +22,7 @@ import com.techelevator.view.Menu;
 public class CampgroundCLI {
 	
 	private Menu menu;
+	private Park chosenPark;
 	private ParkDao parkDao;
 	private CampgroundDao campgroundDao;
 	private SiteDao siteDao;
@@ -50,7 +54,7 @@ public class CampgroundCLI {
 	public CampgroundCLI(DataSource datasource) {
 		menu = new Menu(System.in, System.out);
 		parkDao = new JdbcParkDao(datasource);
-		//campgroundDao = new JdbcCampgroundDao(datasource);
+		campgroundDao = new JdbcCampgroundDao(datasource);
 		//reservationDao = new JdbcReservationDao(datasource);
 	}
 	 
@@ -62,10 +66,13 @@ public class CampgroundCLI {
 			
 			if (choice.equals(ACADIA)) {
 				parkDao.getParkInfoById(1);
+				chosenPark = parkDao.getParkInfoById(1);
 			} else if (choice.equals(ARCHES)) {
 				parkDao.getParkInfoById(2);
+				chosenPark = parkDao.getParkInfoById(2);
 			} else if (choice.equals(CUYAHOGA)) {
 				parkDao.getParkInfoById(3);
+				chosenPark = parkDao.getParkInfoById(3);
 			} else if (choice.equals(QUIT)) {
 				System.out.println("Thank you for using the National Park Campsite Reservation System!");
 				readyToExit = true;
@@ -83,13 +90,43 @@ public class CampgroundCLI {
 			String choice = (String)menu.getChoiceFromOptions(PARK_OPTIONS);
 			
 			if (choice.equals(VIEW_CAMPGROUNDS)) {
-				//display list of campgrounds
+				campgroundDao.getCampgroundsForPark(chosenPark);
+				displayCampgrounds();
 			} else if (choice.equals(RESERVATION)) {
 				//reservation method
 			} else if (choice.equals(RETURN)) {
 				returnToPreviousScreen = true;
 			}
 		}
+	}
+	
+	private void displayCampgrounds() {
+		
+		int count = 0;
+		
+		int newCount = 0;
+		
+		System.out.println(String.format("%-5s %-35s %-15s %-15s %-15s", " ", "Name", "Open", "Close", "Daily Fee"));
+
+		
+		for (Campground campground : campgroundDao.getCampgroundsForPark(chosenPark)) {
+			
+			for (int i = 0; i <= campgroundDao.getCampgroundsForPark(chosenPark).size(); i++) {
+					count++;
+					newCount = count / 4;
+				}
+
+		
+			BigDecimal price = campground.getDailyFee().setScale(2, RoundingMode.CEILING);
+			String dailyFee = "$" + String.valueOf(price);
+			String openMonth = campground.makeOpenMonthName(campground.getOpenMonth());
+			String closeMonth = campground.makeCloseMonthName(campground.getCloseMonth());
+			String numberFormat = "#" + Integer.toString(newCount);
+			
+			System.out.println(String.format("%-5s %-35s %-15s %-15s %-15s", numberFormat, campground.getCampgroundName(), openMonth, closeMonth, dailyFee));
+		}
+		
+		
 	}
 		
 	/*private void listAllParks() {
