@@ -1,4 +1,4 @@
-package com.techelevator.projects.view;
+package com.techelevator.view;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Menu {
-
+	
 	private PrintWriter out;
 	private Scanner in;
 
@@ -18,7 +18,11 @@ public class Menu {
 	public Object getChoiceFromOptions(Object[] options) {
 		Object choice = null;
 		while(choice == null) {
+			if (options[options.length - 1] == "Quit") {
+				displayMainMenuOptions(options);
+			} else {
 			displayMenuOptions(options);
+			}
 			choice = getChoiceFromUserInput(options);
 		}
 		return choice;
@@ -28,8 +32,11 @@ public class Menu {
 		Object choice = null;
 		String userInput = in.nextLine();
 		try {
+			if(userInput.equalsIgnoreCase("Q")) {
+				choice = options[options.length-1];
+			}
 			int selectedOption = Integer.valueOf(userInput);
-			if(selectedOption <= options.length) {
+			if(selectedOption > 0 && selectedOption <= options.length) {
 				choice = options[selectedOption - 1];
 			}
 		} catch(NumberFormatException e) {
@@ -41,6 +48,18 @@ public class Menu {
 		return choice;
 	}
 
+	private void displayMainMenuOptions(Object[] options) {
+		out.println();
+		for(int i = 0; i < options.length-1; i++) {
+			int optionNum = i+1;
+			out.println(optionNum+") "+options[i]);
+		}
+		out.println("Q) " +options[options.length-1]);
+		out.print("\nPlease choose an option >>> ");
+		out.flush();
+	}
+	
+	
 	private void displayMenuOptions(Object[] options) {
 		out.println();
 		for(int i = 0; i < options.length; i++) {
@@ -51,3 +70,6 @@ public class Menu {
 		out.flush();
 	}
 }
+
+
+
