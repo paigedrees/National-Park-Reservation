@@ -1,5 +1,6 @@
 package com.techelevator.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,28 @@ public class JdbcCampgroundDao implements CampgroundDao {
 			
 		}
 		return resultList;
+	}
+	
+	public Campground getCampgroundInfoById(int id) {
+		Campground theCampground = null;
+		String sqlGetCampgroundInfo = "SELECT * FROM campground WHERE campground_id = ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetCampgroundInfo, id);
+		if(results.next()) {
+			theCampground = mapRowToCampground(results);
+		}
+		
+		return theCampground;
+	}
+	
+	private Campground mapRowToCampground(SqlRowSet results) {
+		Campground theCampground;
+		theCampground = new Campground();
+		theCampground.setCampgroundId(results.getInt("campground_id"));
+		theCampground.setCampgroundName(results.getString("name"));
+		theCampground.setOpenMonth(results.getString("open_from_mm"));
+		theCampground.setCloseMonth(results.getString("open_to_mm"));	
+		theCampground.setDailyFee(results.getBigDecimal("daily_fee"));
+		return theCampground;
 	}
 	
 	/*@Override
