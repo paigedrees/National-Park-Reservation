@@ -61,6 +61,24 @@ public class JdbcSiteDao implements SiteDao {
 		return resultList;
 	}
 	
+	public int returnSiteId(int siteNo, int campgroundId) {
+		Site site = null;
+		String sqlReturnSiteId = "SELECT site_id FROM site WHERE site_number = ? AND campground_id = ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlReturnSiteId, siteNo, campgroundId);
+		if (result.next()) {
+			site = mapRowToSite(result);
+		}
+		
+		return site.getSiteId();
+	}
+	
+	public Site mapRowToSite(SqlRowSet results) {
+		Site newSite = new Site();
+		newSite.setSiteId(results.getInt("site_id"));
+		return newSite;
+	}
+	
+	
 //	public String returnTotalCost(int campgroundId) {
 //		String sqlGetDailyFee = "SELECT daily_fee FROM campground WHERE campground_id = ?";
 //		SqlRowSet feeForCost = jdbcTemplate.queryForRowSet(sqlGetDailyFee, campgroundId);

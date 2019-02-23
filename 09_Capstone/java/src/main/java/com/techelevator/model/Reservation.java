@@ -16,6 +16,10 @@ public class Reservation {
 		return reservationId;
 	}
 	
+	public void setReservationId(int reservationId) {
+		this.reservationId = reservationId;
+	}
+	
 	public void setSiteId(int reservationId) {
 		this.reservationId = reservationId;
 	}
