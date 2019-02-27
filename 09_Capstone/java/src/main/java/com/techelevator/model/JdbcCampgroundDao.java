@@ -59,15 +59,5 @@ public class JdbcCampgroundDao implements CampgroundDao {
 		return theCampground;
 	}
 	
-	/*@Override
-	public List<String> getCampgroundList(Park park){
-		List<Campground> allCampgrounds = getCampgroundsForPark(park);
-		
-		List<String> results = new ArrayList<String>();
-		
-		for (Campground c : allCampgrounds) {
-			Park 
-		} 
-	} */
 
 }

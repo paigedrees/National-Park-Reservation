@@ -30,11 +30,6 @@ public class JdbcSiteDao implements SiteDao {
 		
 		LocalDate requestedStart = LocalDate.parse(arrival, dateFormat);
 		LocalDate requestedEnd = LocalDate.parse(departure, dateFormat); 
-		//requestedStart.format(dateFormat);
-		//LocalDate existingEnd;
-		
-		//Duration diff = Duration.between(requestedStart.atStartOfDay(), requestedEnd.atStartOfDay());
-		//long diffDays = diff.toDays();
 		
 		String sqlGetReservationAvailability = "SELECT * FROM site WHERE site.campground_id = ? AND site.site_id NOT IN "+ 
 												"(SELECT site.site_id FROM site JOIN reservation ON reservation.site_id = site.site_id WHERE reservation.from_date >= ? AND reservation.to_date <= ?) LIMIT 5";
@@ -78,13 +73,5 @@ public class JdbcSiteDao implements SiteDao {
 		return newSite;
 	}
 	
-	
-//	public String returnTotalCost(int campgroundId) {
-//		String sqlGetDailyFee = "SELECT daily_fee FROM campground WHERE campground_id = ?";
-//		SqlRowSet feeForCost = jdbcTemplate.queryForRowSet(sqlGetDailyFee, campgroundId);
-//		String[] costArray = 
-//		int fee = Integer.parseInt(feeForCost);
-//		BigDecimal cost = BigDecimal.valueOf(feeForCost * (diffDays);
-//	}
 
 }

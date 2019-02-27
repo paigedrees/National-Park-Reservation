@@ -116,6 +116,7 @@ public class CampgroundCLI {
 			} else {
 			
 			parkDao.getParkInfoById(Integer.parseInt(parkChoice));
+			chosenPark = parkDao.getParkInfoById(Integer.parseInt(parkChoice));
 
 			//OLD MENU:
 //				String choice = (String)menu.getChoiceFromOptions(MAIN_MENU_CHOICES);
@@ -134,9 +135,9 @@ public class CampgroundCLI {
 //				System.out.println("Thank you for using the National Park Campsite Reservation System!");
 //				readyToExit = true;
 //			}
-//			if (readyToExit == false) {
-//				displayParkOptionsMenu();
-//			} 
+			if (readyToExit == false) {
+				displayParkOptionsMenu();
+			} 
 			
 			}
 		} 

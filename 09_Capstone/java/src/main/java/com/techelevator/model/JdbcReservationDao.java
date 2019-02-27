@@ -48,7 +48,6 @@ public class JdbcReservationDao implements ReservationDao {
 
 
 	
-	
 	//Triyng to get Total Cost from daily fees.
 	//String sqlGetDailyFee = "SELECT daily_fee FROM campground WHERE campground_id = ?";
 	//SqlRowSet feeForCost = jdbcTemplate.queryForRowSet(sqlGetDailyFee, campground);
